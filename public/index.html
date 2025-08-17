@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сжатие Изображений без Потери Качества</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Заголовок -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-compress-alt"></i>
+                    <h1>ImageCompress Pro</h1>
+                </div>
+                <p class="subtitle">Сжатие JPG и PNG изображений без потери качества</p>
+            </div>
+        </header>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Зона загрузки файлов -->
+            <section class="upload-section">
+                <div class="upload-container" id="uploadContainer">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text">
+                            <h2>Перетащите изображения сюда</h2>
+                            <p>или нажмите, чтобы выбрать файлы</p>
+                            <span class="file-types">Поддерживаются: JPG, JPEG, PNG (до 10 файлов, максимум 10MB каждый)</span>
+                        </div>
+                        <input type="file" id="fileInput" multiple accept=".jpg,.jpeg,.png" hidden>
+                    </div>
+                </div>
+
+                <!-- Кнопки управления -->
+                <div class="upload-controls">
+                    <button class="btn btn-primary" id="selectFilesBtn">
+                        <i class="fas fa-folder-open"></i>
+                        Выбрать файлы
+                    </button>
+                    <button class="btn btn-success" id="compressBtn" disabled>
+                        <i class="fas fa-compress"></i>
+                        Сжать изображения
+                    </button>
+                    <button class="btn btn-secondary" id="clearAllBtn" disabled>
+                        <i class="fas fa-trash"></i>
+                        Очистить все
+                    </button>
+                </div>
+            </section>
+
+            <!-- Предварительный просмотр файлов -->
+            <section class="preview-section" id="previewSection" style="display: none;">
+                <h3>Выбранные файлы</h3>
+                <div class="file-preview-container" id="filePreviewContainer">
+                    <!-- Файлы будут добавлены через JavaScript -->
+                </div>
+            </section>
+
+            <!-- Прогресс загрузки -->
+            <section class="progress-section" id="progressSection" style="display: none;">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Обработка файлов...</div>
+                </div>
+            </section>
+
+            <!-- Результаты сжатия -->
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-header">
+                    <h3>Результаты сжатия</h3>
+                    <button class="btn btn-primary" id="downloadAllBtn">
+                        <i class="fas fa-download"></i>
+                        Скачать все
+                    </button>
+                </div>
+                <div class="results-container" id="resultsContainer">
+                    <!-- Результаты будут добавлены через JavaScript -->
+                </div>
+            </section>
+
+            <!-- Статистика -->
+            <section class="stats-section" id="statsSection" style="display: none;">
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalFiles">0</div>
+                        <div class="stat-label">Файлов обработано</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalSaved">0 КБ</div>
+                        <div class="stat-label">Сохранено места</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="averageCompression">0%</div>
+                        <div class="stat-label">Среднее сжатие</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Подвал -->
+        <footer class="footer">
+            <p>&copy; 2024 ImageCompress Pro. Сжатие изображений без потери качества.</p>
+        </footer>
+    </div>
+
+    <!-- Уведомления -->
+    <div id="notifications" class="notifications-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
