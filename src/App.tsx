@@ -1,4 +1,5 @@
 import React from "react";
+import JSZip from "jszip";
 import {
     formatBytes,
     readImageFile,
@@ -55,6 +56,31 @@ function useImages() {
         setProcessingIds(new Set());
     }, []);
 
+    const downloadAll = React.useCallback(async () => {
+        const compressedItems = items.filter((item): item is ProcessedImage => "blob" in item);
+
+        if (compressedItems.length === 0) return;
+
+        const zip = new JSZip();
+
+        // Добавляем каждый сжатый файл в архив
+        compressedItems.forEach((item) => zip.file(item.file.name, item.blob));
+
+        // Создаем и скачиваем zip архив
+        try {
+            const zipBlob = await zip.generateAsync({ type: "blob" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(zipBlob);
+            link.download = "optimized.zip";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(link.href), 2000);
+        } catch (error) {
+            console.error("Ошибка при создании архива:", error);
+        }
+    }, [items]);
+
     const clearError = React.useCallback((id: string) => {
         setErrorsById((prev) => {
             const copy = { ...prev };
@@ -63,7 +89,7 @@ function useImages() {
         });
     }, []);
 
-    return { items, addFiles, clearAll, setItems, errorsById, clearError, setErrorsById, processingIds };
+    return { items, addFiles, clearAll, downloadAll, setItems, errorsById, clearError, setErrorsById, processingIds };
 }
 
 function useDrop(onFiles: (files: FileList | File[]) => void) {
@@ -98,7 +124,8 @@ function useDrop(onFiles: (files: FileList | File[]) => void) {
 }
 
 export default function App() {
-    const { items, addFiles, clearAll, setItems, errorsById, clearError, setErrorsById, processingIds } = useImages();
+    const { items, addFiles, clearAll, downloadAll, setItems, errorsById, clearError, setErrorsById, processingIds } =
+        useImages();
     const { isOver, onDrop, onDragOver, onDragLeave } = useDrop(addFiles);
     const inputRef = React.useRef<HTMLInputElement | null>(null);
 
@@ -119,15 +146,18 @@ export default function App() {
     const onDownload = React.useCallback((item: SourceImage | ProcessedImage) => {
         if (!("blob" in item)) return;
         const link = document.createElement("a");
-        const ext = item.type === "image/png" ? "png" : "jpg";
-        const name = item.file.name.replace(/\.(png|jpg|jpeg)$/i, "") + `-optimized.${ext}`;
         link.href = URL.createObjectURL(item.blob);
-        link.download = name;
+        link.download = item.file.name;
         document.body.appendChild(link);
         link.click();
         link.remove();
         setTimeout(() => URL.revokeObjectURL(link.href), 2000);
     }, []);
+
+    // Вычисляем количество готовых файлов
+    const compressedItemsCount = React.useMemo(() => {
+        return items.filter((item) => "blob" in item).length;
+    }, [items]);
 
     return (
         <div className="app">
@@ -204,6 +234,11 @@ export default function App() {
                         <div className="images-header">
                             <h3>Uploaded Files ({items.length})</h3>
                             <div className="images-actions">
+                                {compressedItemsCount > 0 && (
+                                    <button className="btn-primary" onClick={downloadAll}>
+                                        Download All ({compressedItemsCount})
+                                    </button>
+                                )}
                                 <button className="btn-secondary" onClick={clearAll}>
                                     Clear All
                                 </button>
