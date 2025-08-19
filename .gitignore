@@ -27,4 +27,4 @@ coverage/
 *.log
 
 # TypeScript build info
-*.tsbuildinfo
+#*.tsbuildinfo
