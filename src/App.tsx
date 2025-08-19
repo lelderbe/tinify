@@ -228,50 +228,66 @@ export default function App() {
                             </div>
                         </div>
 
-                        <div className="images-grid">
-                            {items.map((item) => (
-                                <div className="image-card" key={item.id}>
-                                    <div className="card-header">
-                                        <div className="name" title={item.file.name}>
-                                            {item.file.name}
+                        <div className="uploaded-files">
+                            {items.map((item) => {
+                                const isCompressed = "blob" in item;
+                                const compressionPercent = isCompressed
+                                    ? Math.round((1 - item.compressedBytes / item.originalBytes) * 100)
+                                    : 0;
+
+                                return (
+                                    <div className="file-card" key={item.id}>
+                                        <div className="file-thumbnail">
+                                            <img src={item.objectUrl} alt={item.file.name} />
                                         </div>
-                                        <div className="row">
-                                            <span className="badge">{item.type === "image/png" ? "PNG" : "JPG"}</span>
-                                            <button className="btn-secondary" onClick={() => onRemove(item.id)}>
-                                                Remove
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div className="card-body">
-                                        <img className="preview" src={item.objectUrl} alt={item.file.name} />
-                                        <div className="row" style={{ justifyContent: "space-between", marginTop: 8 }}>
-                                            <div className="meta">
-                                                <div>
-                                                    Size: {formatBytes(item.originalBytes)} →{" "}
-                                                    {"blob" in item ? formatBytes(item.compressedBytes) : "—"}
-                                                </div>
-                                                <div>
-                                                    Resolution: {item.width}×{item.height}
-                                                </div>
+
+                                        <div className="file-info">
+                                            <div className="file-name" title={item.file.name}>
+                                                {item.file.name}
                                             </div>
-                                            {"blob" in item ? (
-                                                <button className="btn-primary" onClick={() => onDownload(item)}>
-                                                    Download
-                                                </button>
-                                            ) : (
-                                                <button className="btn-secondary" disabled>
-                                                    Not compressed
-                                                </button>
+                                            {isCompressed && (
+                                                <div className="file-status">
+                                                    <span className="status-icon">✓</span>
+                                                    <span>Compressed successfully</span>
+                                                </div>
                                             )}
+                                            <div className="file-size">
+                                                {formatBytes(item.originalBytes)} →{" "}
+                                                {isCompressed ? formatBytes(item.compressedBytes) : "—"}
+                                            </div>
                                         </div>
+
+                                        <div className="file-actions">
+                                            <div className="file-type-badge">
+                                                {item.type === "image/png" ? "PNG" : "JPG"}
+                                            </div>
+                                            {isCompressed && (
+                                                <div className="compression-percent">-{compressionPercent}% size</div>
+                                            )}
+                                            <div className="action-buttons">
+                                                {isCompressed ? (
+                                                    <button className="download-btn" onClick={() => onDownload(item)}>
+                                                        Download
+                                                    </button>
+                                                ) : (
+                                                    <button className="download-btn" disabled>
+                                                        Not compressed
+                                                    </button>
+                                                )}
+                                                <button className="remove-btn" onClick={() => onRemove(item.id)}>
+                                                    ✕
+                                                </button>
+                                            </div>
+                                        </div>
+
                                         {errorsById[item.id] && (
                                             <div className="error" onClick={() => clearError(item.id)}>
                                                 {errorsById[item.id]}
                                             </div>
                                         )}
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 )}
