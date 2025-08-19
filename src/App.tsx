@@ -144,91 +144,148 @@ export default function App() {
     );
 
     return (
-        <div className="container">
-            <div className="header">
-                <div className="title">Сжатие изображений (JPG/PNG)</div>
-                <div className="row">
-                    <button className="secondary" onClick={clearAll} disabled={items.length === 0}>
-                        Очистить
-                    </button>
-                    <button className="primary" onClick={processAll} disabled={items.length === 0 || isProcessing}>
-                        {isProcessing ? "Обработка…" : "Сжать"}
-                    </button>
+        <div className="app">
+            {/* Header */}
+            <header className="app-header">
+                <div className="logo">
+                    <div className="logo-icon">📷</div>
+                    <span className="logo-text">ImageCompress</span>
                 </div>
-            </div>
-
-            <div
-                className={`dropzone ${isOver ? "dragover" : ""}`}
-                onDragOver={onDragOver}
-                onDragLeave={onDragLeave}
-                onDrop={onDrop}
-            >
-                <div>
-                    <div>Перетащите JPG/PNG сюда или выберите файлы</div>
-                    <div className="hint">Формат сохраняется. Можно загружать несколько файлов.</div>
-                    <div style={{ marginTop: 12 }}>
-                        <button className="primary" onClick={onSelectClick}>
-                            Выбрать файлы
-                        </button>
-                        <input
-                            ref={inputRef}
-                            className="hidden-input"
-                            type="file"
-                            accept="image/png,image/jpeg"
-                            multiple
-                            onChange={onInputChange}
-                        />
+                <div className="settings">
+                    <div className="setting-item">
+                        <span className="checkmark">✓</span>
+                        <span>Lossless Compression</span>
+                    </div>
+                    <div className="setting-item">
+                        <span className="cross">✕</span>
+                        <span>No Upload to Server</span>
                     </div>
                 </div>
-            </div>
+            </header>
 
-            {items.length > 0 && (
-                <div className="grid">
-                    {items.map((item) => (
-                        <div className="card" key={item.id}>
-                            <div className="card-header">
-                                <div className="name" title={item.file.name}>
-                                    {item.file.name}
-                                </div>
-                                <div className="row">
-                                    <span className="badge">{item.type === "image/png" ? "PNG" : "JPG"}</span>
-                                    <button className="secondary" onClick={() => onRemove(item.id)}>
-                                        Удалить
-                                    </button>
-                                </div>
+            {/* Main Content */}
+            <main className="main-content">
+                <div className="hero">
+                    <h1 className="hero-title">Combine Images Without Quality Loss</h1>
+                    <p className="hero-description">
+                        Reduce your JPG and PNG file sizes while maintaining perfect image quality.
+                        <br />
+                        Upload multiple images and download them individually.
+                    </p>
+                </div>
+
+                {items.length === 0 ? (
+                    <div className="upload-section">
+                        <h3 className="upload-title">Upload Images</h3>
+                        <div
+                            className={`upload-area ${isOver ? "dragover" : ""}`}
+                            onDragOver={onDragOver}
+                            onDragLeave={onDragLeave}
+                            onDrop={onDrop}
+                        >
+                            <div className="upload-icon">
+                                <svg
+                                    width="48"
+                                    height="48"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                >
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="7,10 12,15 17,10" />
+                                    <line x1="12" y1="15" x2="12" y2="3" />
+                                </svg>
                             </div>
-                            <div className="card-body">
-                                <img className="preview" src={item.objectUrl} alt={item.file.name} />
-                                <div className="row" style={{ justifyContent: "space-between", marginTop: 8 }}>
-                                    <div className="meta">
-                                        <div>
-                                            Размер: {formatBytes(item.originalBytes)} →{" "}
-                                            {"blob" in item ? formatBytes(item.compressedBytes) : "—"}
-                                        </div>
-                                        <div>
-                                            Разрешение: {item.width}×{item.height}
-                                        </div>
-                                    </div>
-                                    {"blob" in item ? (
-                                        <button className="primary" onClick={() => onDownload(item)}>
-                                            Скачать
-                                        </button>
-                                    ) : (
-                                        <button className="secondary" disabled>
-                                            Не сжато
-                                        </button>
-                                    )}
-                                </div>
-                                {errorsById[item.id] && (
-                                    <div className="error" onClick={() => clearError(item.id)}>
-                                        {errorsById[item.id]}
-                                    </div>
-                                )}
+                            <div className="upload-text">
+                                <h4>Drop images here or click to upload</h4>
+                                <p>Support for JPG and PNG files up to 10MB each. Compression starts automatically.</p>
+                            </div>
+                            <button className="choose-files-btn" onClick={onSelectClick}>
+                                Choose Files
+                            </button>
+                            <input
+                                ref={inputRef}
+                                type="file"
+                                accept="image/png,image/jpeg"
+                                multiple
+                                onChange={onInputChange}
+                                style={{ display: "none" }}
+                            />
+                        </div>
+                    </div>
+                ) : (
+                    <div className="images-section">
+                        <div className="images-header">
+                            <h3>Uploaded Images ({items.length})</h3>
+                            <div className="images-actions">
+                                <button className="btn-secondary" onClick={clearAll}>
+                                    Clear All
+                                </button>
+                                <button className="btn-primary" onClick={processAll} disabled={isProcessing}>
+                                    {isProcessing ? "Processing..." : "Compress All"}
+                                </button>
                             </div>
                         </div>
-                    ))}
-                </div>
-            )}
+
+                        <div className="images-grid">
+                            {items.map((item) => (
+                                <div className="image-card" key={item.id}>
+                                    <div className="card-header">
+                                        <div className="name" title={item.file.name}>
+                                            {item.file.name}
+                                        </div>
+                                        <div className="row">
+                                            <span className="badge">{item.type === "image/png" ? "PNG" : "JPG"}</span>
+                                            <button className="btn-secondary" onClick={() => onRemove(item.id)}>
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="card-body">
+                                        <img className="preview" src={item.objectUrl} alt={item.file.name} />
+                                        <div className="row" style={{ justifyContent: "space-between", marginTop: 8 }}>
+                                            <div className="meta">
+                                                <div>
+                                                    Size: {formatBytes(item.originalBytes)} →{" "}
+                                                    {"blob" in item ? formatBytes(item.compressedBytes) : "—"}
+                                                </div>
+                                                <div>
+                                                    Resolution: {item.width}×{item.height}
+                                                </div>
+                                            </div>
+                                            {"blob" in item ? (
+                                                <button className="btn-primary" onClick={() => onDownload(item)}>
+                                                    Download
+                                                </button>
+                                            ) : (
+                                                <button className="btn-secondary" disabled>
+                                                    Not compressed
+                                                </button>
+                                            )}
+                                        </div>
+                                        {errorsById[item.id] && (
+                                            <div className="error" onClick={() => clearError(item.id)}>
+                                                {errorsById[item.id]}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </main>
+
+            {/* Footer */}
+            <footer className="app-footer">
+                <p>
+                    © 2024 ImageCompress. All processing happens locally in your browser.{" "}
+                    <a href="#" className="privacy-link">
+                        Your privacy is guaranteed.
+                    </a>
+                </p>
+            </footer>
         </div>
     );
 }
