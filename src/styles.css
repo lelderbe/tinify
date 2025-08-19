@@ -304,9 +304,31 @@ body {
     margin-bottom: 4px;
 }
 
+.file-status.processing {
+    color: #0ea5e9;
+}
+
+.file-status.error-status {
+    color: #dc2626;
+}
+
 .status-icon {
     font-weight: bold;
     font-size: 12px;
+}
+
+.status-icon.loading {
+    animation: spin 1s linear infinite;
+    font-size: 14px;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .file-size {

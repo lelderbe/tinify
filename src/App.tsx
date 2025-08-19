@@ -10,13 +10,40 @@ import {
 
 function useImages() {
     const [items, setItems] = React.useState<Array<SourceImage | ProcessedImage>>([]);
-    const [isProcessing, setIsProcessing] = React.useState(false);
+    const [processingIds, setProcessingIds] = React.useState<Set<string>>(new Set());
     const [errorsById, setErrorsById] = React.useState<Record<string, string>>({});
 
     const addFiles = React.useCallback(async (files: FileList | File[]) => {
         const supportedFiles = Array.from(files).filter(isSupportedFile);
         const loaded = await Promise.all(supportedFiles.map(readImageFile));
+
+        // Добавляем файлы сначала как исходные
         setItems((prev) => [...prev, ...loaded]);
+
+        // Автоматически сжимаем каждый файл
+        for (const item of loaded) {
+            setProcessingIds((prev) => new Set(prev).add(item.id));
+            try {
+                const compressed = await recompressImageLossless(item);
+                setItems((prevItems) => prevItems.map((prevItem) => (prevItem.id === item.id ? compressed : prevItem)));
+                setErrorsById((prev) => {
+                    const next = { ...prev };
+                    delete next[item.id];
+                    return next;
+                });
+            } catch (err) {
+                setErrorsById((prev) => ({
+                    ...prev,
+                    [item.id]: "Не удалось сжать. Сервер недоступен или произошла ошибка.",
+                }));
+            } finally {
+                setProcessingIds((prev) => {
+                    const next = new Set(prev);
+                    next.delete(item.id);
+                    return next;
+                });
+            }
+        }
     }, []);
 
     const clearAll = React.useCallback(() => {
@@ -25,29 +52,8 @@ function useImages() {
             return [];
         });
         setErrorsById({});
+        setProcessingIds(new Set());
     }, []);
-
-    const processAll = React.useCallback(async () => {
-        setIsProcessing(true);
-        try {
-            const nextErrors: Record<string, string> = { ...errorsById };
-            const processed: Array<SourceImage | ProcessedImage> = [];
-            for (const item of items) {
-                try {
-                    const out = await recompressImageLossless(item as SourceImage);
-                    processed.push(out);
-                    delete nextErrors[item.id];
-                } catch (err) {
-                    processed.push(item);
-                    nextErrors[item.id] = "Не удалось сжать. Сервер недоступен или произошла ошибка.";
-                }
-            }
-            setItems(processed);
-            setErrorsById(nextErrors);
-        } finally {
-            setIsProcessing(false);
-        }
-    }, [items, errorsById]);
 
     const clearError = React.useCallback((id: string) => {
         setErrorsById((prev) => {
@@ -57,7 +63,7 @@ function useImages() {
         });
     }, []);
 
-    return { items, addFiles, clearAll, processAll, isProcessing, setItems, errorsById, clearError, setErrorsById };
+    return { items, addFiles, clearAll, setItems, errorsById, clearError, setErrorsById, processingIds };
 }
 
 function useDrop(onFiles: (files: FileList | File[]) => void) {
@@ -92,8 +98,7 @@ function useDrop(onFiles: (files: FileList | File[]) => void) {
 }
 
 export default function App() {
-    const { items, addFiles, clearAll, processAll, isProcessing, setItems, errorsById, clearError, setErrorsById } =
-        useImages();
+    const { items, addFiles, clearAll, setItems, errorsById, clearError, setErrorsById, processingIds } = useImages();
     const { isOver, onDrop, onDragOver, onDragLeave } = useDrop(addFiles);
     const inputRef = React.useRef<HTMLInputElement | null>(null);
 
@@ -198,7 +203,10 @@ export default function App() {
                         </div>
                         <div className="upload-text">
                             <h4>Drop images here or click to upload</h4>
-                            <p>Support for JPG and PNG files up to 10MB each. Compression starts automatically.</p>
+                            <p>
+                                Support for JPG and PNG files up to 10MB each. Files are compressed automatically after
+                                upload.
+                            </p>
                         </div>
                         <button className="choose-files-btn" onClick={onSelectClick}>
                             Choose Files
@@ -217,13 +225,10 @@ export default function App() {
                 {items.length > 0 && (
                     <div className="images-section">
                         <div className="images-header">
-                            <h3>Uploaded Images ({items.length})</h3>
+                            <h3>Uploaded Files ({items.length})</h3>
                             <div className="images-actions">
                                 <button className="btn-secondary" onClick={clearAll}>
                                     Clear All
-                                </button>
-                                <button className="btn-primary" onClick={processAll} disabled={isProcessing}>
-                                    {isProcessing ? "Processing..." : "Compress All"}
                                 </button>
                             </div>
                         </div>
@@ -231,6 +236,8 @@ export default function App() {
                         <div className="uploaded-files">
                             {items.map((item) => {
                                 const isCompressed = "blob" in item;
+                                const isProcessing = processingIds.has(item.id);
+                                const hasError = errorsById[item.id];
                                 const compressionPercent = isCompressed
                                     ? Math.round((1 - item.compressedBytes / item.originalBytes) * 100)
                                     : 0;
@@ -245,10 +252,22 @@ export default function App() {
                                             <div className="file-name" title={item.file.name}>
                                                 {item.file.name}
                                             </div>
-                                            {isCompressed && (
+                                            {isProcessing && (
+                                                <div className="file-status processing">
+                                                    <span className="status-icon loading">⟳</span>
+                                                    <span>Compressing...</span>
+                                                </div>
+                                            )}
+                                            {isCompressed && !isProcessing && (
                                                 <div className="file-status">
                                                     <span className="status-icon">✓</span>
                                                     <span>Compressed successfully</span>
+                                                </div>
+                                            )}
+                                            {hasError && !isProcessing && (
+                                                <div className="file-status error-status">
+                                                    <span className="status-icon">✕</span>
+                                                    <span>Compression failed</span>
                                                 </div>
                                             )}
                                             <div className="file-size">
@@ -261,17 +280,17 @@ export default function App() {
                                             <div className="file-type-badge">
                                                 {item.type === "image/png" ? "PNG" : "JPG"}
                                             </div>
-                                            {isCompressed && (
+                                            {isCompressed && !isProcessing && (
                                                 <div className="compression-percent">-{compressionPercent}% size</div>
                                             )}
                                             <div className="action-buttons">
-                                                {isCompressed ? (
+                                                {isCompressed && !isProcessing ? (
                                                     <button className="download-btn" onClick={() => onDownload(item)}>
                                                         Download
                                                     </button>
                                                 ) : (
                                                     <button className="download-btn" disabled>
-                                                        Not compressed
+                                                        {isProcessing ? "Processing..." : "Not compressed"}
                                                     </button>
                                                 )}
                                                 <button className="remove-btn" onClick={() => onRemove(item.id)}>
@@ -280,9 +299,9 @@ export default function App() {
                                             </div>
                                         </div>
 
-                                        {errorsById[item.id] && (
+                                        {hasError && (
                                             <div className="error" onClick={() => clearError(item.id)}>
-                                                {errorsById[item.id]}
+                                                {hasError}
                                             </div>
                                         )}
                                     </div>
