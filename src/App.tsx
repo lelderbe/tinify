@@ -174,47 +174,47 @@ export default function App() {
                     </p>
                 </div>
 
-                {items.length === 0 ? (
-                    <div className="upload-section">
-                        <h3 className="upload-title">Upload Images</h3>
-                        <div
-                            className={`upload-area ${isOver ? "dragover" : ""}`}
-                            onDragOver={onDragOver}
-                            onDragLeave={onDragLeave}
-                            onDrop={onDrop}
-                        >
-                            <div className="upload-icon">
-                                <svg
-                                    width="48"
-                                    height="48"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                >
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                    <polyline points="7,10 12,15 17,10" />
-                                    <line x1="12" y1="15" x2="12" y2="3" />
-                                </svg>
-                            </div>
-                            <div className="upload-text">
-                                <h4>Drop images here or click to upload</h4>
-                                <p>Support for JPG and PNG files up to 10MB each. Compression starts automatically.</p>
-                            </div>
-                            <button className="choose-files-btn" onClick={onSelectClick}>
-                                Choose Files
-                            </button>
-                            <input
-                                ref={inputRef}
-                                type="file"
-                                accept="image/png,image/jpeg"
-                                multiple
-                                onChange={onInputChange}
-                                style={{ display: "none" }}
-                            />
+                <div className="upload-section">
+                    <h3 className="upload-title">Upload Images</h3>
+                    <div
+                        className={`upload-area ${isOver ? "dragover" : ""}`}
+                        onDragOver={onDragOver}
+                        onDragLeave={onDragLeave}
+                        onDrop={onDrop}
+                    >
+                        <div className="upload-icon">
+                            <svg
+                                width="48"
+                                height="48"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                            >
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7,10 12,15 17,10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
                         </div>
+                        <div className="upload-text">
+                            <h4>Drop images here or click to upload</h4>
+                            <p>Support for JPG and PNG files up to 10MB each. Compression starts automatically.</p>
+                        </div>
+                        <button className="choose-files-btn" onClick={onSelectClick}>
+                            Choose Files
+                        </button>
+                        <input
+                            ref={inputRef}
+                            type="file"
+                            accept="image/png,image/jpeg"
+                            multiple
+                            onChange={onInputChange}
+                            style={{ display: "none" }}
+                        />
                     </div>
-                ) : (
+                </div>
+
+                {items.length > 0 && (
                     <div className="images-section">
                         <div className="images-header">
                             <h3>Uploaded Images ({items.length})</h3>
