@@ -4,7 +4,7 @@ import multer from "multer";
 import sharp from "sharp";
 
 const app = express();
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 100 * 1024 * 1024 } });
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
 app.use(cors());
 
@@ -32,7 +32,7 @@ app.post("/api/compress", upload.single("file"), async (req, res) => {
             return res.send(out);
         }
 
-        if (meta.format === "jpeg" || meta.format === "jpg" || meta.format === "pjpeg") {
+        if (meta.format === "jpeg" || meta.format === "jpg") {
             const out = await sharp(buffer)
                 .rotate()
                 .jpeg({ quality: 85, mozjpeg: true, progressive: true, chromaSubsampling: "4:2:0" })

@@ -129,25 +129,6 @@ export default function App() {
         setTimeout(() => URL.revokeObjectURL(link.href), 2000);
     }, []);
 
-    const onRemove = React.useCallback(
-        (id: string) => {
-            setItems((prev) => {
-                const target = prev.find((i) => i.id === id);
-                if (target) {
-                    URL.revokeObjectURL(target.objectUrl);
-                }
-                const next = prev.filter((i) => i.id !== id);
-                return next;
-            });
-            setErrorsById((prev) => {
-                const copy = { ...prev };
-                delete copy[id];
-                return copy;
-            });
-        },
-        [setItems, setErrorsById]
-    );
-
     return (
         <div className="app">
             {/* Header */}
@@ -161,19 +142,15 @@ export default function App() {
                         <span className="checkmark">✓</span>
                         <span>Lossless Compression</span>
                     </div>
-                    <div className="setting-item">
-                        <span className="cross">✕</span>
-                        <span>No Upload to Server</span>
-                    </div>
                 </div>
             </header>
 
             {/* Main Content */}
             <main className="main-content">
                 <div className="hero">
-                    <h1 className="hero-title">Combine Images Without Quality Loss</h1>
+                    <h1 className="hero-title">Compress Images Without Quality Loss</h1>
                     <p className="hero-description">
-                        Reduce your JPG and PNG file sizes while maintaining perfect image quality.
+                        Reduce your JPG and PNG images size while maintaining perfect image quality.
                         <br />
                         Upload multiple images and download them individually.
                     </p>
@@ -204,7 +181,7 @@ export default function App() {
                         <div className="upload-text">
                             <h4>Drop images here or click to upload</h4>
                             <p>
-                                Support for JPG and PNG files up to 10MB each. Files are compressed automatically after
+                                Support for JPG and PNG files up to 5MB each. Files are compressed automatically after
                                 upload.
                             </p>
                         </div>
@@ -281,7 +258,7 @@ export default function App() {
                                                 {item.type === "image/png" ? "PNG" : "JPG"}
                                             </div>
                                             {isCompressed && !isProcessing && (
-                                                <div className="compression-percent">-{compressionPercent}% size</div>
+                                                <div className="compression-percent">-{compressionPercent}%</div>
                                             )}
                                             <div className="action-buttons">
                                                 {isCompressed && !isProcessing ? (
@@ -293,9 +270,6 @@ export default function App() {
                                                         {isProcessing ? "Processing..." : "Not compressed"}
                                                     </button>
                                                 )}
-                                                <button className="remove-btn" onClick={() => onRemove(item.id)}>
-                                                    ✕
-                                                </button>
                                             </div>
                                         </div>
 
@@ -314,12 +288,7 @@ export default function App() {
 
             {/* Footer */}
             <footer className="app-footer">
-                <p>
-                    © 2024 ImageCompress. All processing happens locally in your browser.{" "}
-                    <a href="#" className="privacy-link">
-                        Your privacy is guaranteed.
-                    </a>
-                </p>
+                <p>© 2025 ImageCompress</p>
             </footer>
         </div>
     );

@@ -73,11 +73,6 @@ body {
     font-weight: bold;
 }
 
-.cross {
-    color: #ef4444;
-    font-weight: bold;
-}
-
 /* Main Content */
 .main-content {
     flex: 1;
@@ -362,6 +357,7 @@ body {
     font-size: 13px;
     font-weight: 600;
     margin-bottom: 4px;
+    margin-right: 40px;
 }
 
 .action-buttons {
@@ -391,27 +387,6 @@ body {
     cursor: not-allowed;
 }
 
-.remove-btn {
-    background: transparent;
-    border: none;
-    color: #64748b;
-    font-size: 16px;
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.remove-btn:hover {
-    background: #f1f5f9;
-    color: #374151;
-}
-
 .error {
     color: #dc2626;
     font-size: 12px;
@@ -435,15 +410,6 @@ body {
     border-top: 1px solid #e5e7eb;
     font-size: 14px;
     color: #6b7280;
-}
-
-.privacy-link {
-    color: #3b82f6;
-    text-decoration: none;
-}
-
-.privacy-link:hover {
-    text-decoration: underline;
 }
 
 /* Responsive */
