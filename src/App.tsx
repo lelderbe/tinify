@@ -94,12 +94,47 @@ function useImages() {
 
 function useDrop(onFiles: (files: FileList | File[]) => void) {
     const [isOver, setIsOver] = React.useState(false);
+    const dragCounterRef = React.useRef(0);
+
+    const onDragEnter = React.useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dragCounterRef.current++;
+
+        // Проверяем, что перетаскиваются файлы
+        if (e.dataTransfer.types.includes("Files")) {
+            setIsOver(true);
+        }
+    }, []);
+
+    const onDragOver = React.useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Проверяем, что перетаскиваются файлы
+        if (e.dataTransfer.types.includes("Files")) {
+            setIsOver(true);
+        }
+    }, []);
+
+    const onDragLeave = React.useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dragCounterRef.current--;
+
+        // Скрываем оверлей только когда все drag события завершены
+        if (dragCounterRef.current === 0) {
+            setIsOver(false);
+        }
+    }, []);
 
     const onDrop = React.useCallback(
         (e: React.DragEvent) => {
             e.preventDefault();
             e.stopPropagation();
+            dragCounterRef.current = 0;
             setIsOver(false);
+
             const files = e.dataTransfer.files;
             if (files && files.length > 0) {
                 onFiles(files);
@@ -108,28 +143,17 @@ function useDrop(onFiles: (files: FileList | File[]) => void) {
         [onFiles]
     );
 
-    const onDragOver = React.useCallback((e: React.DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsOver(true);
-    }, []);
-
-    const onDragLeave = React.useCallback((e: React.DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsOver(false);
-    }, []);
-
-    return { isOver, onDrop, onDragOver, onDragLeave };
+    return { isOver, onDrop, onDragOver, onDragEnter, onDragLeave };
 }
 
 export default function App() {
     const { items, addFiles, clearAll, downloadAll, setItems, errorsById, clearError, setErrorsById, processingIds } =
         useImages();
-    const { isOver, onDrop, onDragOver, onDragLeave } = useDrop(addFiles);
+    const { isOver, onDrop, onDragOver, onDragEnter, onDragLeave } = useDrop(addFiles);
     const inputRef = React.useRef<HTMLInputElement | null>(null);
 
-    const onSelectClick = React.useCallback(() => {
+    const onSelectClick = React.useCallback((e: React.SyntheticEvent) => {
+        e.stopPropagation();
         inputRef.current?.click();
     }, []);
 
@@ -160,7 +184,24 @@ export default function App() {
     }, [items]);
 
     return (
-        <div className="app">
+        <div
+            className="app"
+            onDragEnter={onDragEnter}
+            onDragOver={onDragOver}
+            onDragLeave={onDragLeave}
+            onDrop={onDrop}
+        >
+            {/* Полноэкранный оверлей для drag and drop */}
+            {isOver && (
+                <div className="drag-overlay">
+                    <div className="drag-overlay-content">
+                        <div className="drag-icon">📷</div>
+                        <h2>Отпустите файлы для загрузки</h2>
+                        <p>Поддерживаются JPG и PNG файлы</p>
+                    </div>
+                </div>
+            )}
+
             {/* Header */}
             <header className="app-header">
                 <div className="logo">
@@ -188,12 +229,7 @@ export default function App() {
 
                 <div className="upload-section">
                     <h3 className="upload-title">Upload Images</h3>
-                    <div
-                        className={`upload-area ${isOver ? "dragover" : ""}`}
-                        onDragOver={onDragOver}
-                        onDragLeave={onDragLeave}
-                        onDrop={onDrop}
-                    >
+                    <div className={`upload-area ${isOver ? "dragover" : ""}`} onClick={onSelectClick}>
                         <div className="upload-icon">
                             <svg
                                 width="48"
