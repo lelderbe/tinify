@@ -26,6 +26,7 @@ body {
 /* Header */
 .app-header {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     padding: 16px 24px;
@@ -182,6 +183,7 @@ body {
 
 .images-header {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
@@ -498,9 +500,7 @@ body {
 /* Responsive */
 @media (max-width: 768px) {
     .app-header {
-        flex-direction: column;
         gap: 16px;
-        align-items: flex-start;
     }
 
     .settings {
@@ -512,9 +512,7 @@ body {
     }
 
     .images-header {
-        flex-direction: column;
         gap: 16px;
-        align-items: flex-start;
     }
 
     .main-content {
