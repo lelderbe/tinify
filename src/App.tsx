@@ -63,12 +63,12 @@ export default function App() {
             <header className="app-header">
                 <div className="logo">
                     <div className="logo-icon">📷</div>
-                    <span className="logo-text">ImageCompress</span>
+                    <span className="logo-text">Tinify</span>
                 </div>
                 <div className="settings">
                     <div className="setting-item">
                         <span className="checkmark">✓</span>
-                        <span>Lossless Compression</span>
+                        <span>Сжатие без потерь</span>
                     </div>
                 </div>
             </header>
@@ -76,16 +76,16 @@ export default function App() {
             {/* Main Content */}
             <main className="main-content">
                 <div className="hero">
-                    <h1 className="hero-title">Compress Images Without Quality Loss</h1>
-                    <p className="hero-description">
-                        Reduce your JPG and PNG images size while maintaining perfect image quality.
+                    <h1 className="hero-title">Сжимайте изображения без потери качества</h1>
+                    {/* <p className="hero-description">
+                        Сжимайте ваши JPG и PNG изображения, сохраняя идеальное качество изображения.
                         <br />
-                        Upload multiple images and download them individually.
-                    </p>
+                        Загрузите несколько изображений и скачайте их по отдельности.
+                    </p> */}
                 </div>
 
                 <div className="upload-section">
-                    <h3 className="upload-title">Upload Images</h3>
+                    {/* <h3 className="upload-title">Загрузите изображения</h3> */}
                     <div className={`upload-area ${isOver ? "dragover" : ""}`} onClick={onSelectClick}>
                         <div className="upload-icon">
                             <svg
@@ -102,14 +102,11 @@ export default function App() {
                             </svg>
                         </div>
                         <div className="upload-text">
-                            <h4>Drop images here or click to upload</h4>
-                            <p>
-                                Support for JPG and PNG files up to 5MB each. Files are compressed automatically after
-                                upload.
-                            </p>
+                            <h4>Перетащите изображения или нажмите для загрузки</h4>
+                            <p>Поддерживаются JPG и PNG файлы до 5MB каждый</p>
                         </div>
                         <button className="choose-files-btn" onClick={onSelectClick}>
-                            Choose Files
+                            Выбрать изображения
                         </button>
                         <input
                             ref={inputRef}
@@ -125,15 +122,15 @@ export default function App() {
                 {items.length > 0 && (
                     <div className="images-section">
                         <div className="images-header">
-                            <h3>Uploaded Files ({items.length})</h3>
+                            <h3>Загруженные изображения ({items.length})</h3>
                             <div className="images-actions">
                                 {compressedItemsCount > 0 && (
                                     <button className="btn-primary" onClick={downloadAll}>
-                                        Download All ({compressedItemsCount})
+                                        Скачать все ({compressedItemsCount})
                                     </button>
                                 )}
                                 <button className="btn-secondary" onClick={clearAll}>
-                                    Clear All
+                                    Очистить
                                 </button>
                             </div>
                         </div>
@@ -160,19 +157,19 @@ export default function App() {
                                             {isProcessing && (
                                                 <div className="file-status processing">
                                                     <span className="status-icon loading">⟳</span>
-                                                    <span>Compressing...</span>
+                                                    <span>Сжимается...</span>
                                                 </div>
                                             )}
                                             {isCompressed && !isProcessing && (
                                                 <div className="file-status">
                                                     <span className="status-icon">✓</span>
-                                                    <span>Compressed successfully</span>
+                                                    <span>Сжато успешно</span>
                                                 </div>
                                             )}
                                             {hasError && !isProcessing && (
                                                 <div className="file-status error-status">
                                                     <span className="status-icon">✕</span>
-                                                    <span>Compression failed</span>
+                                                    <span>Сжатие не удалось</span>
                                                 </div>
                                             )}
                                             <div className="file-size">
@@ -191,11 +188,11 @@ export default function App() {
                                             <div className="action-buttons">
                                                 {isCompressed && !isProcessing ? (
                                                     <button className="download-btn" onClick={() => onDownload(item)}>
-                                                        Download
+                                                        Скачать
                                                     </button>
                                                 ) : (
                                                     <button className="download-btn" disabled>
-                                                        {isProcessing ? "Processing..." : "Not compressed"}
+                                                        {isProcessing ? "Сжимается..." : "Не сжато"}
                                                     </button>
                                                 )}
                                             </div>
@@ -216,7 +213,7 @@ export default function App() {
 
             {/* Footer */}
             <footer className="app-footer">
-                <p>© 2025 ImageCompress</p>
+                <p>© 2025 Tinify</p>
             </footer>
         </div>
     );
