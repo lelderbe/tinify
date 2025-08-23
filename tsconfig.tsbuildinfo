@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/lib/image.ts"],"version":"5.9.2"}
+{"root":["./src/app.tsx","./src/main.tsx","./src/hooks/usedrop.ts","./src/hooks/useimages.ts","./src/lib/image.ts"],"version":"5.9.2"}

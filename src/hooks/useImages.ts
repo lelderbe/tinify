@@ -71,7 +71,7 @@ export function useImages() {
             const zipBlob = await zip.generateAsync({ type: "blob" });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(zipBlob);
-            link.download = "optimized.zip";
+            link.download = "tinified.zip";
             document.body.appendChild(link);
             link.click();
             link.remove();
