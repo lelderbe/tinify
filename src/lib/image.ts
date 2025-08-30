@@ -50,7 +50,7 @@ function loadHtmlImage(src: string): Promise<HTMLImageElement> {
     });
 }
 
-export async function recompressImageLossless(image: SourceImage): Promise<ProcessedImage> {
+export async function recompressImage(image: SourceImage): Promise<ProcessedImage> {
     // Strictly use backend. If it fails, propagate error.
     const blob = await compressOnServer(image.file);
     return { ...image, blob, compressedBytes: blob.size };

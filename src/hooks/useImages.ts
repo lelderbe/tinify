@@ -3,7 +3,7 @@ import JSZip from "jszip";
 import {
     formatBytes,
     readImageFile,
-    recompressImageLossless,
+    recompressImage,
     type ProcessedImage,
     type SourceImage,
     isSupportedFile,
@@ -19,13 +19,13 @@ export function useImages() {
         const loaded = await Promise.all(supportedFiles.map(readImageFile));
 
         // Добавляем файлы сначала как исходные
-        setItems((prev) => [...prev, ...loaded]);
+        setItems((prev) => [...loaded, ...prev]);
 
         // Автоматически сжимаем каждый файл
         for (const item of loaded) {
             setProcessingIds((prev) => new Set(prev).add(item.id));
             try {
-                const compressed = await recompressImageLossless(item);
+                const compressed = await recompressImage(item);
                 setItems((prevItems) => prevItems.map((prevItem) => (prevItem.id === item.id ? compressed : prevItem)));
                 setErrorsById((prev) => {
                     const next = { ...prev };

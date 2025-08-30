@@ -25,7 +25,7 @@ app.post("/api/compress", upload.single("file"), async (req, res) => {
         if (meta.format === "png") {
             const out = await sharp(buffer)
                 .rotate()
-                .png({ compressionLevel: 9, effort: 10, progressive: false, adaptiveFiltering: true })
+                .png({ compressionLevel: 9, effort: 10, progressive: false, adaptiveFiltering: false })
                 .toBuffer();
             res.setHeader("Content-Type", "image/png");
             res.setHeader("Content-Disposition", `inline; filename="${safeName(originalname)}"`);
@@ -35,7 +35,7 @@ app.post("/api/compress", upload.single("file"), async (req, res) => {
         if (meta.format === "jpeg" || meta.format === "jpg") {
             const out = await sharp(buffer)
                 .rotate()
-                .jpeg({ quality: 85, mozjpeg: true, progressive: true, chromaSubsampling: "4:2:0" })
+                .jpeg({ quality: 75, mozjpeg: true, progressive: true, chromaSubsampling: "4:2:0" })
                 .toBuffer();
             res.setHeader("Content-Type", "image/jpeg");
             res.setHeader("Content-Disposition", `inline; filename="${safeName(originalname)}"`);

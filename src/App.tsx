@@ -77,15 +77,9 @@ export default function App() {
             <main className="main-content">
                 <div className="hero">
                     <h1 className="hero-title">Сжимайте изображения без потери качества</h1>
-                    {/* <p className="hero-description">
-                        Сжимайте ваши JPG и PNG изображения, сохраняя идеальное качество изображения.
-                        <br />
-                        Загрузите несколько изображений и скачайте их по отдельности.
-                    </p> */}
                 </div>
 
                 <div className="upload-section">
-                    {/* <h3 className="upload-title">Загрузите изображения</h3> */}
                     <div className={`upload-area ${isOver ? "dragover" : ""}`} onClick={onSelectClick}>
                         <div className="upload-icon">
                             <svg
