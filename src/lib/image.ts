@@ -50,9 +50,9 @@ function loadHtmlImage(src: string): Promise<HTMLImageElement> {
     });
 }
 
-export async function recompressImage(image: SourceImage): Promise<ProcessedImage> {
+export async function recompressImage(image: SourceImage, jpgQuality: number = 75): Promise<ProcessedImage> {
     // Strictly use backend. If it fails, propagate error.
-    const blob = await compressOnServer(image.file);
+    const blob = await compressOnServer(image.file, jpgQuality);
     return { ...image, blob, compressedBytes: blob.size };
 }
 
@@ -64,9 +64,10 @@ export function formatBytes(bytes: number): string {
     return `${mb.toFixed(2)} MB`;
 }
 
-async function compressOnServer(file: File): Promise<Blob> {
+async function compressOnServer(file: File, jpgQuality: number = 75): Promise<Blob> {
     const form = new FormData();
     form.set("file", file, file.name);
+    form.set("quality", jpgQuality.toString());
     const res = await fetch("/api/compress", {
         method: "POST",
         body: form,

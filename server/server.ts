@@ -19,6 +19,11 @@ app.post("/api/compress", upload.single("file"), async (req, res) => {
         }
         const { buffer, originalname } = req.file;
 
+        // Получаем качество из параметров, по умолчанию 75
+        const quality = req.body.quality ? parseInt(req.body.quality) : 75;
+        // Ограничиваем качество в разумных пределах
+        const clampedQuality = Math.max(10, Math.min(100, quality));
+
         const img = sharp(buffer);
         const meta = await img.metadata();
 
@@ -35,7 +40,7 @@ app.post("/api/compress", upload.single("file"), async (req, res) => {
         if (meta.format === "jpeg" || meta.format === "jpg") {
             const out = await sharp(buffer)
                 .rotate()
-                .jpeg({ quality: 75, mozjpeg: true, progressive: true, chromaSubsampling: "4:2:0" })
+                .jpeg({ quality: clampedQuality, mozjpeg: true, progressive: true, chromaSubsampling: "4:2:0" })
                 .toBuffer();
             res.setHeader("Content-Type", "image/jpeg");
             res.setHeader("Content-Disposition", `inline; filename="${safeName(originalname)}"`);

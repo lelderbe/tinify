@@ -4,10 +4,30 @@ import { useImages } from "./hooks/useImages";
 import { useDrop } from "./hooks/useDrop";
 
 export default function App() {
-    const { items, addFiles, clearAll, downloadAll, setItems, errorsById, clearError, setErrorsById, processingIds } =
-        useImages();
+    const [jpgQuality, setJpgQuality] = React.useState(75);
+    const { items, addFiles, clearAll, downloadAll, errorsById, clearError, processingIds, recompressJpgFiles } =
+        useImages(jpgQuality);
     const { isOver, onDrop, onDragOver, onDragEnter, onDragLeave } = useDrop(addFiles);
     const inputRef = React.useRef<HTMLInputElement | null>(null);
+    const qualityTimeoutRef = React.useRef<NodeJS.Timeout>();
+
+    // Обработчик изменения качества JPG с debounce
+    const handleJpgQualityChange = React.useCallback((newQuality: number) => {
+        setJpgQuality(newQuality);
+
+        // Очищаем предыдущий таймаут
+        clearTimeout(qualityTimeoutRef.current);
+
+        // Устанавливаем новый таймаут для пересжатия
+        qualityTimeoutRef.current = setTimeout(() => recompressJpgFiles(newQuality), 500); // 500ms задержка
+    }, [recompressJpgFiles]);
+
+    // Очищаем таймаут при размонтировании
+    React.useEffect(() => {
+        return () => {
+            clearTimeout(qualityTimeoutRef.current);
+        };
+    }, []);
 
     const onSelectClick = React.useCallback((e: React.SyntheticEvent) => {
         e.stopPropagation();
@@ -66,9 +86,20 @@ export default function App() {
                     <span className="logo-text">Tinify</span>
                 </div>
                 <div className="settings">
-                    <div className="setting-item">
-                        <span className="checkmark">✓</span>
-                        <span>Сжатие без потерь</span>
+                    <div className="setting-item quality-setting">
+                        <label htmlFor="jpg-quality" className="quality-label">
+                            Качество JPG: {jpgQuality}%
+                        </label>
+                        <input
+                            id="jpg-quality"
+                            type="range"
+                            min="10"
+                            max="100"
+                            step="5"
+                            value={jpgQuality}
+                            onChange={(e) => handleJpgQualityChange(Number(e.target.value))}
+                            className="quality-slider"
+                        />
                     </div>
                 </div>
             </header>
@@ -76,7 +107,7 @@ export default function App() {
             {/* Main Content */}
             <main className="main-content">
                 <div className="hero">
-                    <h1 className="hero-title">Сжимайте изображения без потери качества</h1>
+                    <h1 className="hero-title">Оптимизация изображений</h1>
                 </div>
 
                 <div className="upload-section">
