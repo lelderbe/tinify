@@ -3,7 +3,7 @@ import { formatBytes } from './lib/image';
 import { useImages } from './hooks/useImages';
 import { useDrop } from './hooks/useDrop';
 import { getStoredJpgQuality, setStoredJpgQuality } from './lib/jpgQuality';
-import { JPG_QUALITY_STEP, MAX_JPG_QUALITY, MIN_JPG_QUALITY } from '../shared/constants';
+import { JPG_QUALITY_STEP, MAX_FILE_SIZE, MAX_JPG_QUALITY, MIN_JPG_QUALITY } from '../shared/constants';
 
 export default function App() {
     const [jpgQuality, setJpgQuality] = React.useState(getStoredJpgQuality);
@@ -136,7 +136,7 @@ export default function App() {
                         </div>
                         <div className="upload-text">
                             <h4>Перетащите изображения или нажмите для загрузки</h4>
-                            <p>Поддерживаются JPG и PNG файлы до 5MB каждый</p>
+                            <p>Поддерживаются JPG и PNG файлы до {MAX_FILE_SIZE}MB каждый</p>
                         </div>
                         <button className="choose-files-btn" onClick={handleSelectClick}>
                             Выбрать изображения
@@ -178,7 +178,7 @@ export default function App() {
                                     : 0;
 
                                 return (
-                                    <div className="file-card" key={item.id}>
+                                    <div className="file-card" key={item.id} onClick={() => handleDownload(item)}>
                                         <div className="file-thumbnail">
                                             <img src={item.objectUrl} alt={item.file.name} />
                                         </div>
@@ -226,12 +226,7 @@ export default function App() {
                                             )}
                                             <div className="action-buttons">
                                                 {isCompressed && !isProcessing ? (
-                                                    <button
-                                                        className="download-btn"
-                                                        onClick={() => handleDownload(item)}
-                                                    >
-                                                        Скачать
-                                                    </button>
+                                                    <button className="download-btn">Скачать</button>
                                                 ) : (
                                                     <button className="download-btn" disabled>
                                                         {isProcessing ? 'Сжимается...' : 'Не сжато'}
