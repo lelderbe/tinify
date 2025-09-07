@@ -1,6 +1,6 @@
-import { DEFAULT_JPG_QUALITY } from "../../shared/constants";
+import { DEFAULT_JPG_QUALITY } from '../../shared/constants';
 
-export type SupportedMime = "image/jpeg" | "image/png";
+export type SupportedMime = 'image/jpeg' | 'image/png';
 
 export interface SourceImage {
     id: string;
@@ -18,12 +18,12 @@ export interface ProcessedImage extends SourceImage {
 }
 
 export function isSupportedFile(file: File): file is File & { type: SupportedMime } {
-    return file.type === "image/jpeg" || file.type === "image/png";
+    return file.type === 'image/jpeg' || file.type === 'image/png';
 }
 
 export async function readImageFile(file: File): Promise<SourceImage> {
     if (!isSupportedFile(file)) {
-        throw new Error("Unsupported file type");
+        throw new Error('Unsupported file type');
     }
     const objectUrl = URL.createObjectURL(file);
     try {
@@ -47,7 +47,7 @@ function loadHtmlImage(src: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
         const img = new Image();
         img.onload = () => resolve(img);
-        img.onerror = () => reject(new Error("Failed to load image"));
+        img.onerror = () => reject(new Error('Failed to load image'));
         img.src = src;
     });
 }
@@ -71,14 +71,14 @@ export function formatBytes(bytes: number): string {
 
 async function compressOnServer(file: File, jpgQuality: number = DEFAULT_JPG_QUALITY): Promise<Blob> {
     const form = new FormData();
-    form.set("file", file, file.name);
-    form.set("quality", jpgQuality.toString());
-    const res = await fetch("/api/compress", {
-        method: "POST",
+    form.set('file', file, file.name);
+    form.set('quality', jpgQuality.toString());
+    const res = await fetch('/api/compress', {
+        method: 'POST',
         body: form,
     });
     if (!res.ok) {
-        throw new Error("server_compress_failed");
+        throw new Error('server_compress_failed');
     }
     return await res.blob();
 }

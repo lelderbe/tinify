@@ -1,9 +1,9 @@
-import { DEFAULT_JPG_QUALITY, MAX_JPG_QUALITY, MIN_JPG_QUALITY } from "../../shared/constants";
+import { DEFAULT_JPG_QUALITY, MAX_JPG_QUALITY, MIN_JPG_QUALITY } from '../../shared/constants';
 
 // Функции для работы с localStorage
 export const getStoredJpgQuality = (): number => {
     try {
-        const stored = localStorage.getItem("jpgQuality");
+        const stored = localStorage.getItem('jpgQuality');
         if (stored) {
             const value = parseInt(stored, 10);
             // Проверяем, что значение в допустимом диапазоне
@@ -12,15 +12,15 @@ export const getStoredJpgQuality = (): number => {
             }
         }
     } catch (error) {
-        console.warn("Не удалось загрузить jpgQuality из localStorage:", error);
+        console.warn('Не удалось загрузить jpgQuality из localStorage:', error);
     }
     return DEFAULT_JPG_QUALITY; // значение по умолчанию
 };
 
 export const setStoredJpgQuality = (value: number): void => {
     try {
-        localStorage.setItem("jpgQuality", value.toString());
+        localStorage.setItem('jpgQuality', value.toString());
     } catch (error) {
-        console.warn("Не удалось сохранить jpgQuality в localStorage:", error);
+        console.warn('Не удалось сохранить jpgQuality в localStorage:', error);
     }
 };

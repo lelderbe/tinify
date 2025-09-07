@@ -1,5 +1,5 @@
-import React from "react";
-import JSZip from "jszip";
+import React from 'react';
+import JSZip from 'jszip';
 import {
     formatBytes,
     readImageFile,
@@ -7,7 +7,7 @@ import {
     type ProcessedImage,
     type SourceImage,
     isSupportedFile,
-} from "../lib/image";
+} from '../lib/image';
 
 export function useImages(jpgQuality: number = 75) {
     const [items, setItems] = React.useState<Array<SourceImage | ProcessedImage>>([]);
@@ -34,7 +34,7 @@ export function useImages(jpgQuality: number = 75) {
                 } catch (err) {
                     setErrorsById((prev) => ({
                         ...prev,
-                        [item.id]: "Не удалось сжать. Сервер недоступен или произошла ошибка.",
+                        [item.id]: 'Не удалось сжать. Сервер недоступен или произошла ошибка.',
                     }));
                 } finally {
                     setProcessingIds((prev) => {
@@ -51,7 +51,7 @@ export function useImages(jpgQuality: number = 75) {
     // Функция для пересжатия JPG файлов при изменении качества
     const recompressJpgFiles = React.useCallback(
         async (newQuality: number) => {
-            const jpgItems = items.filter((item) => item.type === "image/jpeg");
+            const jpgItems = items.filter((item) => item.type === 'image/jpeg');
             compressItems(jpgItems, newQuality);
         },
         [items, processingIds]
@@ -71,6 +71,17 @@ export function useImages(jpgQuality: number = 75) {
         [jpgQuality]
     );
 
+    const handleDownload = React.useCallback((item: SourceImage | ProcessedImage) => {
+        if (!('blob' in item)) return;
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(item.blob);
+        link.download = item.file.name;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(link.href), 2000);
+    }, []);
+
     const clearAll = React.useCallback(() => {
         setItems((prev) => {
             prev.forEach((i) => URL.revokeObjectURL(i.objectUrl));
@@ -81,7 +92,7 @@ export function useImages(jpgQuality: number = 75) {
     }, []);
 
     const downloadAll = React.useCallback(async () => {
-        const compressedItems = items.filter((item): item is ProcessedImage => "blob" in item);
+        const compressedItems = items.filter((item): item is ProcessedImage => 'blob' in item);
 
         if (compressedItems.length === 0) return;
 
@@ -92,16 +103,16 @@ export function useImages(jpgQuality: number = 75) {
 
         // Создаем и скачиваем zip архив
         try {
-            const zipBlob = await zip.generateAsync({ type: "blob" });
-            const link = document.createElement("a");
+            const zipBlob = await zip.generateAsync({ type: 'blob' });
+            const link = document.createElement('a');
             link.href = URL.createObjectURL(zipBlob);
-            link.download = "tinified.zip";
+            link.download = 'tinified.zip';
             document.body.appendChild(link);
             link.click();
             link.remove();
             setTimeout(() => URL.revokeObjectURL(link.href), 2000);
         } catch (error) {
-            console.error("Ошибка при создании архива:", error);
+            console.error('Ошибка при создании архива:', error);
         }
     }, [items]);
 
@@ -122,5 +133,6 @@ export function useImages(jpgQuality: number = 75) {
         clearError,
         processingIds,
         recompressJpgFiles,
+        handleDownload,
     };
 }

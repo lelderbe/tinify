@@ -412,6 +412,10 @@ body {
     margin-right: 40px;
 }
 
+.compression-percent.bad {
+    color: #dc2626;
+}
+
 .action-buttons {
     display: flex;
     gap: 8px;

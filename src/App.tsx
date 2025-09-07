@@ -1,14 +1,23 @@
-import React from "react";
-import { formatBytes, type ProcessedImage, type SourceImage } from "./lib/image";
-import { useImages } from "./hooks/useImages";
-import { useDrop } from "./hooks/useDrop";
-import { getStoredJpgQuality, setStoredJpgQuality } from "./lib/jpgQuality";
-import { JPG_QUALITY_STEP, MAX_JPG_QUALITY, MIN_JPG_QUALITY } from "../shared/constants";
+import React from 'react';
+import { formatBytes } from './lib/image';
+import { useImages } from './hooks/useImages';
+import { useDrop } from './hooks/useDrop';
+import { getStoredJpgQuality, setStoredJpgQuality } from './lib/jpgQuality';
+import { JPG_QUALITY_STEP, MAX_JPG_QUALITY, MIN_JPG_QUALITY } from '../shared/constants';
 
 export default function App() {
     const [jpgQuality, setJpgQuality] = React.useState(getStoredJpgQuality);
-    const { items, addFiles, clearAll, downloadAll, errorsById, clearError, processingIds, recompressJpgFiles } =
-        useImages(jpgQuality);
+    const {
+        items,
+        addFiles,
+        clearAll,
+        downloadAll,
+        errorsById,
+        clearError,
+        processingIds,
+        recompressJpgFiles,
+        handleDownload,
+    } = useImages(jpgQuality);
     const { isOver, onDrop, onDragOver, onDragEnter, onDragLeave } = useDrop(addFiles);
     const inputRef = React.useRef<HTMLInputElement | null>(null);
     const qualityTimeoutRef = React.useRef<NodeJS.Timeout>();
@@ -39,35 +48,24 @@ export default function App() {
         };
     }, []);
 
-    const onSelectClick = React.useCallback((e: React.SyntheticEvent) => {
+    const handleSelectClick = React.useCallback((e: React.SyntheticEvent) => {
         e.stopPropagation();
         inputRef.current?.click();
     }, []);
 
-    const onInputChange = React.useCallback(
+    const handleInputChange = React.useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             if (e.target.files && e.target.files.length > 0) {
                 addFiles(e.target.files);
-                e.target.value = "";
+                e.target.value = '';
             }
         },
         [addFiles]
     );
 
-    const onDownload = React.useCallback((item: SourceImage | ProcessedImage) => {
-        if (!("blob" in item)) return;
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(item.blob);
-        link.download = item.file.name;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        setTimeout(() => URL.revokeObjectURL(link.href), 2000);
-    }, []);
-
     // Вычисляем количество готовых файлов
     const compressedItemsCount = React.useMemo(() => {
-        return items.filter((item) => "blob" in item).length;
+        return items.filter((item) => 'blob' in item).length;
     }, [items]);
 
     return (
@@ -121,7 +119,7 @@ export default function App() {
                 </div>
 
                 <div className="upload-section">
-                    <div className={`upload-area ${isOver ? "dragover" : ""}`} onClick={onSelectClick}>
+                    <div className={`upload-area ${isOver ? 'dragover' : ''}`} onClick={handleSelectClick}>
                         <div className="upload-icon">
                             <svg
                                 width="48"
@@ -140,7 +138,7 @@ export default function App() {
                             <h4>Перетащите изображения или нажмите для загрузки</h4>
                             <p>Поддерживаются JPG и PNG файлы до 5MB каждый</p>
                         </div>
-                        <button className="choose-files-btn" onClick={onSelectClick}>
+                        <button className="choose-files-btn" onClick={handleSelectClick}>
                             Выбрать изображения
                         </button>
                         <input
@@ -148,8 +146,8 @@ export default function App() {
                             type="file"
                             accept="image/png,image/jpeg"
                             multiple
-                            onChange={onInputChange}
-                            style={{ display: "none" }}
+                            onChange={handleInputChange}
+                            style={{ display: 'none' }}
                         />
                     </div>
                 </div>
@@ -172,11 +170,11 @@ export default function App() {
 
                         <div className="uploaded-files">
                             {items.map((item) => {
-                                const isCompressed = "blob" in item;
+                                const isCompressed = 'blob' in item;
                                 const isProcessing = processingIds.has(item.id);
                                 const hasError = errorsById[item.id];
                                 const compressionPercent = isCompressed
-                                    ? Math.round((1 - item.compressedBytes / item.originalBytes) * 100)
+                                    ? Math.round((item.compressedBytes / item.originalBytes - 1) * 100)
                                     : 0;
 
                                 return (
@@ -208,26 +206,35 @@ export default function App() {
                                                 </div>
                                             )}
                                             <div className="file-size">
-                                                {formatBytes(item.originalBytes)} →{" "}
-                                                {isCompressed ? formatBytes(item.compressedBytes) : "—"}
+                                                {formatBytes(item.originalBytes)} →{' '}
+                                                {isCompressed ? formatBytes(item.compressedBytes) : '—'}
                                             </div>
                                         </div>
 
                                         <div className="file-actions">
                                             <div className="file-type-badge">
-                                                {item.type === "image/png" ? "PNG" : "JPG"}
+                                                {item.type === 'image/png' ? 'PNG' : 'JPG'}
                                             </div>
                                             {isCompressed && !isProcessing && (
-                                                <div className="compression-percent">-{compressionPercent}%</div>
+                                                <div
+                                                    className={`compression-percent ${
+                                                        compressionPercent > 0 ? 'bad' : ''
+                                                    }`}
+                                                >
+                                                    {compressionPercent}%
+                                                </div>
                                             )}
                                             <div className="action-buttons">
                                                 {isCompressed && !isProcessing ? (
-                                                    <button className="download-btn" onClick={() => onDownload(item)}>
+                                                    <button
+                                                        className="download-btn"
+                                                        onClick={() => handleDownload(item)}
+                                                    >
                                                         Скачать
                                                     </button>
                                                 ) : (
                                                     <button className="download-btn" disabled>
-                                                        {isProcessing ? "Сжимается..." : "Не сжато"}
+                                                        {isProcessing ? 'Сжимается...' : 'Не сжато'}
                                                     </button>
                                                 )}
                                             </div>

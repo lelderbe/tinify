@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export function useDrop(onFiles: (files: FileList | File[]) => void) {
     const [isOver, setIsOver] = React.useState(false);
@@ -10,7 +10,7 @@ export function useDrop(onFiles: (files: FileList | File[]) => void) {
         dragCounterRef.current++;
 
         // Проверяем, что перетаскиваются файлы
-        if (e.dataTransfer.types.includes("Files")) {
+        if (e.dataTransfer.types.includes('Files')) {
             setIsOver(true);
         }
     }, []);
@@ -20,7 +20,7 @@ export function useDrop(onFiles: (files: FileList | File[]) => void) {
         e.stopPropagation();
 
         // Проверяем, что перетаскиваются файлы
-        if (e.dataTransfer.types.includes("Files")) {
+        if (e.dataTransfer.types.includes('Files')) {
             setIsOver(true);
         }
     }, []);
