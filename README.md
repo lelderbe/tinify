@@ -111,15 +111,18 @@ npm run preview
 tinify/
 ├── src/                   # Исходный код фронтенда
 │   ├── App.tsx            # Главный компонент
-│   ├── main.tsx           # Точка входа
+│   ├── index.tsx          # Точка входа
 │   ├── styles.css         # Стили
 │   ├── hooks/             # React хуки
 │   │   ├── useImages.ts   # Логика работы с изображениями
 │   │   └── useDrop.ts     # Логика drag & drop
 │   └── lib/               # Утилиты
+│       ├── jpgQuality.ts  # Логика работы с localStorage для настройки jpgQuality
 │       └── image.ts       # Типы и функции для работы с изображениями
 ├── server/                # Серверная часть
 │   └── server.ts          # Express сервер
+├── shared/                # Общие файлы
+│   └── constants.ts       # Константы приложения
 ├── index.html             # HTML шаблон
 ├── package.json           # Зависимости и скрипты
 └── vite.config.ts         # Конфигурация Vite
@@ -143,10 +146,10 @@ tinify/
 
 ```javascript
 const formData = new FormData();
-formData.append("file", imageFile);
+formData.append('file', imageFile);
 
-const response = await fetch("/api/compress", {
-    method: "POST",
+const response = await fetch('/api/compress', {
+    method: 'POST',
     body: formData,
 });
 
