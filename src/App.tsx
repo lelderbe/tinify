@@ -12,15 +12,18 @@ export default function App() {
     const qualityTimeoutRef = React.useRef<NodeJS.Timeout>();
 
     // Обработчик изменения качества JPG с debounce
-    const handleJpgQualityChange = React.useCallback((newQuality: number) => {
-        setJpgQuality(newQuality);
+    const handleJpgQualityChange = React.useCallback(
+        (newQuality: number) => {
+            setJpgQuality(newQuality);
 
-        // Очищаем предыдущий таймаут
-        clearTimeout(qualityTimeoutRef.current);
+            // Очищаем предыдущий таймаут
+            clearTimeout(qualityTimeoutRef.current);
 
-        // Устанавливаем новый таймаут для пересжатия
-        qualityTimeoutRef.current = setTimeout(() => recompressJpgFiles(newQuality), 500); // 500ms задержка
-    }, [recompressJpgFiles]);
+            // Устанавливаем новый таймаут для пересжатия
+            qualityTimeoutRef.current = setTimeout(() => recompressJpgFiles(newQuality), 500); // 500ms задержка
+        },
+        [recompressJpgFiles]
+    );
 
     // Очищаем таймаут при размонтировании
     React.useEffect(() => {

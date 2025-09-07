@@ -14,51 +14,62 @@ export function useImages(jpgQuality: number = 75) {
     const [processingIds, setProcessingIds] = React.useState<Set<string>>(new Set());
     const [errorsById, setErrorsById] = React.useState<Record<string, string>>({});
 
-    const compressItems = React.useCallback(async (items: Array<SourceImage | ProcessedImage>, quality: number) => {
-        for (const item of items) {
-            // Пропускаем уже обрабатываемые файлы
-            if (processingIds.has(item.id)) continue;
+    const compressItems = React.useCallback(
+        async (items: Array<SourceImage | ProcessedImage>, quality: number) => {
+            for (const item of items) {
+                // Пропускаем уже обрабатываемые файлы
+                if (processingIds.has(item.id)) continue;
 
-            setProcessingIds((prev) => new Set(prev).add(item.id));
-            try {
-                const compressed = await recompressImage(item, quality);
-                setItems((prevItems) => prevItems.map((prevItem) => (prevItem.id === item.id ? compressed : prevItem)));
-                setErrorsById((prev) => {
-                    const next = { ...prev };
-                    delete next[item.id];
-                    return next;
-                });
-            } catch (err) {
-                setErrorsById((prev) => ({
-                    ...prev,
-                    [item.id]: "Не удалось сжать. Сервер недоступен или произошла ошибка.",
-                }));
-            } finally {
-                setProcessingIds((prev) => {
-                    const next = new Set(prev);
-                    next.delete(item.id);
-                    return next;
-                });
+                setProcessingIds((prev) => new Set(prev).add(item.id));
+                try {
+                    const compressed = await recompressImage(item, quality);
+                    setItems((prevItems) =>
+                        prevItems.map((prevItem) => (prevItem.id === item.id ? compressed : prevItem))
+                    );
+                    setErrorsById((prev) => {
+                        const next = { ...prev };
+                        delete next[item.id];
+                        return next;
+                    });
+                } catch (err) {
+                    setErrorsById((prev) => ({
+                        ...prev,
+                        [item.id]: "Не удалось сжать. Сервер недоступен или произошла ошибка.",
+                    }));
+                } finally {
+                    setProcessingIds((prev) => {
+                        const next = new Set(prev);
+                        next.delete(item.id);
+                        return next;
+                    });
+                }
             }
-        }
-    }, [processingIds]);
+        },
+        [processingIds]
+    );
 
     // Функция для пересжатия JPG файлов при изменении качества
-    const recompressJpgFiles = React.useCallback(async (newQuality: number) => {
-        const jpgItems = items.filter((item) => item.type === "image/jpeg");
-        compressItems(jpgItems, newQuality);
-    }, [items, processingIds]);
+    const recompressJpgFiles = React.useCallback(
+        async (newQuality: number) => {
+            const jpgItems = items.filter((item) => item.type === "image/jpeg");
+            compressItems(jpgItems, newQuality);
+        },
+        [items, processingIds]
+    );
 
-    const addFiles = React.useCallback(async (files: FileList | File[]) => {
-        const supportedFiles = Array.from(files).filter(isSupportedFile);
-        const loaded = await Promise.all(supportedFiles.map(readImageFile));
+    const addFiles = React.useCallback(
+        async (files: FileList | File[]) => {
+            const supportedFiles = Array.from(files).filter(isSupportedFile);
+            const loaded = await Promise.all(supportedFiles.map(readImageFile));
 
-        // Добавляем файлы сначала как исходные
-        setItems((prev) => [...loaded, ...prev]);
+            // Добавляем файлы сначала как исходные
+            setItems((prev) => [...loaded, ...prev]);
 
-        // Автоматически сжимаем каждый файл
-        compressItems(loaded, jpgQuality);
-    }, [jpgQuality]);
+            // Автоматически сжимаем каждый файл
+            compressItems(loaded, jpgQuality);
+        },
+        [jpgQuality]
+    );
 
     const clearAll = React.useCallback(() => {
         setItems((prev) => {
