@@ -1,3 +1,5 @@
+import { DEFAULT_JPG_QUALITY } from "../../shared/constants";
+
 export type SupportedMime = "image/jpeg" | "image/png";
 
 export interface SourceImage {
@@ -50,7 +52,10 @@ function loadHtmlImage(src: string): Promise<HTMLImageElement> {
     });
 }
 
-export async function recompressImage(image: SourceImage, jpgQuality: number = 75): Promise<ProcessedImage> {
+export async function recompressImage(
+    image: SourceImage,
+    jpgQuality: number = DEFAULT_JPG_QUALITY
+): Promise<ProcessedImage> {
     // Strictly use backend. If it fails, propagate error.
     const blob = await compressOnServer(image.file, jpgQuality);
     return { ...image, blob, compressedBytes: blob.size };
@@ -64,7 +69,7 @@ export function formatBytes(bytes: number): string {
     return `${mb.toFixed(2)} MB`;
 }
 
-async function compressOnServer(file: File, jpgQuality: number = 75): Promise<Blob> {
+async function compressOnServer(file: File, jpgQuality: number = DEFAULT_JPG_QUALITY): Promise<Blob> {
     const form = new FormData();
     form.set("file", file, file.name);
     form.set("quality", jpgQuality.toString());

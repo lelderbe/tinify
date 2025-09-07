@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import multer from "multer";
 import sharp from "sharp";
+import { DEFAULT_JPG_QUALITY, MAX_JPG_QUALITY, MIN_JPG_QUALITY } from "../shared/constants";
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
@@ -20,9 +21,9 @@ app.post("/api/compress", upload.single("file"), async (req, res) => {
         const { buffer, originalname } = req.file;
 
         // Получаем качество из параметров, по умолчанию 75
-        const quality = req.body.quality ? parseInt(req.body.quality) : 75;
+        const quality = req.body.quality ? parseInt(req.body.quality) : DEFAULT_JPG_QUALITY;
         // Ограничиваем качество в разумных пределах
-        const clampedQuality = Math.max(10, Math.min(100, quality));
+        const clampedQuality = Math.max(MIN_JPG_QUALITY, Math.min(MAX_JPG_QUALITY, quality));
 
         const img = sharp(buffer);
         const meta = await img.metadata();

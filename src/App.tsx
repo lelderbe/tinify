@@ -2,9 +2,11 @@ import React from "react";
 import { formatBytes, type ProcessedImage, type SourceImage } from "./lib/image";
 import { useImages } from "./hooks/useImages";
 import { useDrop } from "./hooks/useDrop";
+import { getStoredJpgQuality, setStoredJpgQuality } from "./lib/jpgQuality";
+import { JPG_QUALITY_STEP, MAX_JPG_QUALITY, MIN_JPG_QUALITY } from "../shared/constants";
 
 export default function App() {
-    const [jpgQuality, setJpgQuality] = React.useState(75);
+    const [jpgQuality, setJpgQuality] = React.useState(getStoredJpgQuality);
     const { items, addFiles, clearAll, downloadAll, errorsById, clearError, processingIds, recompressJpgFiles } =
         useImages(jpgQuality);
     const { isOver, onDrop, onDragOver, onDragEnter, onDragLeave } = useDrop(addFiles);
@@ -24,6 +26,11 @@ export default function App() {
         },
         [recompressJpgFiles]
     );
+
+    // Сохраняем jpgQuality в localStorage при изменении
+    React.useEffect(() => {
+        setStoredJpgQuality(jpgQuality);
+    }, [jpgQuality]);
 
     // Очищаем таймаут при размонтировании
     React.useEffect(() => {
@@ -96,9 +103,9 @@ export default function App() {
                         <input
                             id="jpg-quality"
                             type="range"
-                            min="10"
-                            max="100"
-                            step="5"
+                            min={MIN_JPG_QUALITY}
+                            max={MAX_JPG_QUALITY}
+                            step={JPG_QUALITY_STEP}
                             value={jpgQuality}
                             onChange={(e) => handleJpgQualityChange(Number(e.target.value))}
                             className="quality-slider"
