@@ -92,7 +92,7 @@ export default function App() {
             <header className="app-header">
                 <div className="logo">
                     <div className="logo-icon">📷</div>
-                    <span className="logo-text">Tinify</span>
+                    <span className="logo-text">Оптимизация изображений</span>
                 </div>
                 <div className="settings">
                     <div className="setting-item quality-setting">
@@ -115,10 +115,6 @@ export default function App() {
 
             {/* Main Content */}
             <main className="main-content">
-                <div className="hero">
-                    <h1 className="hero-title">Оптимизация изображений</h1>
-                </div>
-
                 <div className="upload-section">
                     <div className={`upload-area ${isOver ? 'dragover' : ''}`} onClick={handleSelectClick}>
                         <div className="upload-icon">
