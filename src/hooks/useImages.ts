@@ -8,11 +8,13 @@ import {
     type SourceImage,
     isSupportedFile,
 } from '../lib/image';
+import { DEFAULT_JPG_QUALITY } from '../../shared/constants';
 
-export function useImages(jpgQuality: number = 75) {
+export function useImages(jpgQuality: number = DEFAULT_JPG_QUALITY) {
     const [items, setItems] = React.useState<Array<SourceImage | ProcessedImage>>([]);
     const [processingIds, setProcessingIds] = React.useState<Set<string>>(new Set());
     const [errorsById, setErrorsById] = React.useState<Record<string, string>>({});
+    const [downloadedIds, setDownloadedIds] = React.useState<Set<string>>(new Set());
 
     const compressItems = React.useCallback(
         async (items: Array<SourceImage | ProcessedImage>, quality: number) => {
@@ -21,6 +23,11 @@ export function useImages(jpgQuality: number = 75) {
                 if (processingIds.has(item.id)) continue;
 
                 setProcessingIds((prev) => new Set(prev).add(item.id));
+                setDownloadedIds((prev) => {
+                    const next = new Set(prev);
+                    next.delete(item.id);
+                    return next;
+                });
                 try {
                     const compressed = await recompressImage(item, quality);
                     setItems((prevItems) =>
@@ -80,6 +87,7 @@ export function useImages(jpgQuality: number = 75) {
         link.click();
         link.remove();
         setTimeout(() => URL.revokeObjectURL(link.href), 2000);
+        setDownloadedIds((prev) => new Set(prev).add(item.id));
     }, []);
 
     const clearAll = React.useCallback(() => {
@@ -89,6 +97,7 @@ export function useImages(jpgQuality: number = 75) {
         });
         setErrorsById({});
         setProcessingIds(new Set());
+        setDownloadedIds(new Set());
     }, []);
 
     const downloadAll = React.useCallback(async () => {
@@ -134,5 +143,6 @@ export function useImages(jpgQuality: number = 75) {
         processingIds,
         recompressJpgFiles,
         handleDownload,
+        downloadedIds,
     };
 }

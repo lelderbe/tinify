@@ -311,6 +311,16 @@ body {
     border-color: #0ea5e9;
 }
 
+.file-card.downloaded {
+    background: #f9fafb;
+    border-color: #e5e7eb;
+}
+
+.file-card.downloaded:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+
 .file-thumbnail {
     width: 64px;
     height: 64px;

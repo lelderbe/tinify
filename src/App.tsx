@@ -17,6 +17,7 @@ export default function App() {
         processingIds,
         recompressJpgFiles,
         handleDownload,
+        downloadedIds,
     } = useImages(jpgQuality);
     const { isOver, onDrop, onDragOver, onDragEnter, onDragLeave } = useDrop(addFiles);
     const inputRef = React.useRef<HTMLInputElement | null>(null);
@@ -173,12 +174,17 @@ export default function App() {
                                 const isCompressed = 'blob' in item;
                                 const isProcessing = processingIds.has(item.id);
                                 const hasError = errorsById[item.id];
+                                const isDownloaded = downloadedIds.has(item.id);
                                 const compressionPercent = isCompressed
                                     ? Math.round((item.compressedBytes / item.originalBytes - 1) * 100)
                                     : 0;
 
                                 return (
-                                    <div className="file-card" key={item.id} onClick={() => handleDownload(item)}>
+                                    <div
+                                        className={`file-card ${isDownloaded ? 'downloaded' : ''}`}
+                                        key={item.id}
+                                        onClick={() => handleDownload(item)}
+                                    >
                                         <div className="file-thumbnail">
                                             <img src={item.objectUrl} alt={item.file.name} />
                                         </div>

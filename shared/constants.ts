@@ -1,4 +1,4 @@
-export const MAX_FILE_SIZE = 5; // 5MB
+export const MAX_FILE_SIZE = 10; // MB
 
 export const DEFAULT_JPG_QUALITY = 75;
 export const MIN_JPG_QUALITY = 10;
