@@ -2,11 +2,18 @@ import React from 'react';
 import { formatBytes } from './lib/image';
 import { useImages } from './hooks/useImages';
 import { useDrop } from './hooks/useDrop';
-import { getStoredJpgQuality, setStoredJpgQuality } from './lib/jpgQuality';
-import { JPG_QUALITY_STEP, MAX_FILE_SIZE, MAX_JPG_QUALITY, MIN_JPG_QUALITY } from '../shared/constants';
+import { parseJpgQuality } from './lib/jpgQuality';
+import {
+    DEFAULT_JPG_QUALITY,
+    JPG_QUALITY_STEP,
+    MAX_FILE_SIZE,
+    MAX_JPG_QUALITY,
+    MIN_JPG_QUALITY,
+} from '../shared/constants';
+import { useLocalStorage } from './hooks/useLocalStorage';
 
 export default function App() {
-    const [jpgQuality, setJpgQuality] = React.useState(getStoredJpgQuality);
+    const [jpgQuality, setJpgQuality] = useLocalStorage('jpgQuality', DEFAULT_JPG_QUALITY, parseJpgQuality);
     const {
         items,
         addFiles,
@@ -36,11 +43,6 @@ export default function App() {
         },
         [recompressJpgFiles]
     );
-
-    // Сохраняем jpgQuality в localStorage при изменении
-    React.useEffect(() => {
-        setStoredJpgQuality(jpgQuality);
-    }, [jpgQuality]);
 
     // Очищаем таймаут при размонтировании
     React.useEffect(() => {
