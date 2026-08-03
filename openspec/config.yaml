@@ -26,25 +26,25 @@ context: |
   - API: POST /api/compress (multipart file + optional quality), GET /api/health
 
   Conventions:
-  - className — первый атрибут в JSX-тегах
-  - Event handlers с префиксом handle (handleClick, handleKeyDown)
-  - Early returns, описательные имена
-  - Избегать enums; использовать types / objects / maps
-  - Не добавлять useMemo/useCallback без необходимости
   - Коммиты и PR — только по явной просьбе
   - Ответы и пользовательский UI — на русском
+  - Language for artifacts: Russian (product) + English identifiers in code/API.
 
 rules:
   proposal:
+    - Все предложения писать на русском языке
     - Держать proposal коротким: проблема, scope, подход, non-goals
     - Явно указывать затронутые зоны: frontend / backend / shared / API
   specs:
+    - Все спецификации писать на русском языке
     - Формулировать требования в Given/When/Then
     - Учитывать лимиты файла, форматы и JPG quality
   design:
+    - Все дизайн-документации писать на русском языке
     - Описывать поток данных UI → API → Sharp → ответ
     - Отмечать влияние на hooks (useImages, useDrop) и shared/constants
   tasks:
+    - Все задачи писать на русском языке
     - Дробить задачи на небольшие проверяемые шаги
     - Отдельно выделять изменения UI, API и shared-констант
 
