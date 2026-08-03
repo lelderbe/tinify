@@ -1,0 +1,58 @@
+schema: spec-driven
+
+context: |
+  Product: Tinify — веб-приложение для сжатия изображений без потери качества (JPG/PNG).
+
+  Tech stack:
+  - Frontend: React 18, TypeScript, Vite 7, CSS (custom properties)
+  - Backend: Express.js, Sharp, Multer, CORS
+  - Shared: TypeScript constants in shared/
+  - Tooling: Prettier, concurrently, tsx
+  - Package manager: npm
+
+  Architecture:
+  - src/ — React UI (App, hooks, lib)
+  - server/server.ts — Express API
+  - shared/constants.ts — общие константы (лимиты, JPG quality)
+  - Dev: frontend :5173, backend :8787 (проксируется Vite)
+
+  Domain rules:
+  - Поддерживаемые форматы: JPG и PNG
+  - Максимальный размер файла: 10MB (MAX_FILE_SIZE)
+  - JPG quality: 10–100%, default 75%, step 5; хранится в localStorage
+  - При изменении quality JPG пересжимаются с debounce 500ms
+  - PNG: compressionLevel 9, effort 10
+  - JPG: mozjpeg, progressive, chromaSubsampling 4:2:0
+  - API: POST /api/compress (multipart file + optional quality), GET /api/health
+
+  Conventions:
+  - className — первый атрибут в JSX-тегах
+  - Event handlers с префиксом handle (handleClick, handleKeyDown)
+  - Early returns, описательные имена
+  - Избегать enums; использовать types / objects / maps
+  - Не добавлять useMemo/useCallback без необходимости
+  - Коммиты и PR — только по явной просьбе
+  - Ответы и пользовательский UI — на русском
+
+rules:
+  proposal:
+    - Держать proposal коротким: проблема, scope, подход, non-goals
+    - Явно указывать затронутые зоны: frontend / backend / shared / API
+  specs:
+    - Формулировать требования в Given/When/Then
+    - Учитывать лимиты файла, форматы и JPG quality
+  design:
+    - Описывать поток данных UI → API → Sharp → ответ
+    - Отмечать влияние на hooks (useImages, useDrop) и shared/constants
+  tasks:
+    - Дробить задачи на небольшие проверяемые шаги
+    - Отдельно выделять изменения UI, API и shared-констант
+
+operations:
+  apply:
+    guidance:
+      - Не ломать существующий drag & drop и ZIP-скачивание без явной задачи
+      - Сохранять совместимость API /api/compress и /api/health
+  archive:
+    guidance:
+      - Кратко суммировать итог change перед архивацией
